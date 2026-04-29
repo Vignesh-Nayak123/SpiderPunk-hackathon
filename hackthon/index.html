@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Offline Layer — An offline-first SDK that makes any app work without internet. Two lines of code. Any app.">
+  <title>Offline Layer — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Network Banner -->
+    <div id="network-banner" class="network-banner online">
+      <div class="banner-content">
+        <span class="banner-dot"></span>
+        <span class="banner-text">Connected via WiFi</span>
+        <span class="banner-latency">12ms</span>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="logo">
+          <span class="logo-icon">⚡</span>
+          <span class="logo-text">Offline Layer</span>
+        </div>
+        <span class="version-badge">SDK v1.0</span>
+      </div>
+      <div class="header-right">
+        <div class="storage-mini" id="storage-mini">
+          <div class="storage-mini-bar"><div class="storage-mini-fill" id="storage-mini-fill"></div></div>
+          <span class="storage-mini-text" id="storage-mini-text">2.1 MB</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tab Navigation -->
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="chat" id="tab-chat">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">Chat</span>
+        <span class="tab-badge" id="chat-badge" style="display:none">0</span>
+      </button>
+      <button class="tab-btn" data-tab="feed" id="tab-feed">
+        <span class="tab-icon">📰</span>
+        <span class="tab-label">Feed</span>
+        <span class="tab-badge prefetch-badge" id="feed-badge">3 ⚡</span>
+      </button>
+      <button class="tab-btn" data-tab="demo" id="tab-demo">
+        <span class="tab-icon">🎛️</span>
+        <span class="tab-label">Controls</span>
+      </button>
+    </nav>
+
+    <!-- Screen Container -->
+    <main class="screen-container">
+      <!-- Chat Screen -->
+      <div class="screen active" id="screen-chat">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-area">
+          <input type="text" id="chat-input" class="chat-input" placeholder="Type a message..." autocomplete="off">
+          <button id="chat-send" class="chat-send-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Feed Screen -->
+      <div class="screen" id="screen-feed">
+        <div class="feed-list" id="feed-list"></div>
+      </div>
+
+      <!-- Demo Control Screen -->
+      <div class="screen" id="screen-demo">
+        <div class="demo-controls">
+          <!-- Offline Toggle -->
+          <div class="control-card">
+            <div class="control-header">
+              <h3>🌐 Network Control</h3>
+              <span class="control-desc">Toggle connectivity for demo</span>
+            </div>
+            <div class="toggle-container">
+              <span class="toggle-label" id="toggle-label">Online</span>
+              <label class="toggle-switch">
+                <input type="checkbox" id="offline-toggle">
+                <span class="toggle-slider"></span>
+              </label>
+              <span class="toggle-status" id="toggle-status">WiFi</span>
+            </div>
+          </div>
+
+          <!-- Sync Button -->
+          <div class="control-card">
+            <div class="control-header">
+              <h3>🔄 Sync Engine</h3>
+              <span class="control-desc">Force sync pending actions</span>
+            </div>
+            <div class="sync-controls">
+              <button id="sync-btn" class="btn btn-primary">
+                <span class="btn-icon">🔄</span> Force Sync
+              </button>
+              <div class="sync-status" id="sync-status">
+                <span class="sync-count" id="sync-count">0</span> pending actions
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Prediction Log -->
+          <div class="control-card prediction-card">
+            <div class="control-header">
+              <h3>🧠 AI Prediction Log</h3>
+              <div class="hit-rate-badge" id="hit-rate-badge">
+                <span class="hit-rate-value" id="hit-rate-value">100%</span> hit rate
+              </div>
+            </div>
+            <div class="prediction-log" id="prediction-log"></div>
+            <button id="predict-btn" class="btn btn-secondary">
+              <span class="btn-icon">🔮</span> Run Prediction
+            </button>
+          </div>
+
+          <!-- Storage Usage -->
+          <div class="control-card">
+            <div class="control-header">
+              <h3>💾 Storage Budget</h3>
+              <span class="storage-limit">50 MB max</span>
+            </div>
+            <div class="storage-meter">
+              <div class="storage-bar">
+                <div class="storage-fill" id="storage-fill"></div>
+              </div>
+              <div class="storage-info">
+                <span id="storage-used">2.1 MB</span> / <span>50 MB</span>
+                <span class="storage-percent" id="storage-percent">4%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Reset -->
+          <div class="control-card">
+            <div class="control-header">
+              <h3>🗑️ Reset Demo</h3>
+              <span class="control-desc">Clear all cached data and restart</span>
+            </div>
+            <button id="reset-btn" class="btn btn-danger">
+              <span class="btn-icon">♻️</span> Reset Everything
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+  </div>
+
+  <!-- Load SDK -->
+  <script src="predictor/utils/TimeUtils.js"></script>
+  <script src="sdk/cache/CacheEngine.js"></script>
+  <script src="sdk/cache/StorageBudget.js"></script>
+  <script src="sdk/sync/ActionQueue.js"></script>
+  <script src="sdk/sync/DeltaSync.js"></script>
+  <script src="sdk/network/NetworkMonitor.js"></script>
+  <script src="sdk/index.js"></script>
+
+  <!-- Load Predictor -->
+  <script src="demo/seed-data.js"></script>
+  <script src="predictor/tracker/BehaviorTracker.js"></script>
+  <script src="predictor/tracker/BehaviorUploader.js"></script>
+  <script src="predictor/tracker/SessionManager.js"></script>
+  <script src="predictor/prefetch/PrefetchManager.js"></script>
+  <script src="predictor/prefetch/PrefetchScheduler.js"></script>
+  <script src="predictor/prefetch/PrefetchLogger.js"></script>
+  <script src="predictor/index.js"></script>
+
+  <!-- Load App Components -->
+  <script src="app/components/NetworkBanner.js"></script>
+  <script src="app/components/MessageBubble.js"></script>
+  <script src="app/components/FeedCard.js"></script>
+  <script src="app/screens/ChatScreen.js"></script>
+  <script src="app/screens/FeedScreen.js"></script>
+  <script src="app/screens/DemoControlScreen.js"></script>
+  <script src="app/App.js"></script>
+</body>
+</html>
