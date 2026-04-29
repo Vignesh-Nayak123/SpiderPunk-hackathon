@@ -1,0 +1,19 @@
+{
+  "name": "offline-layer",
+  "version": "1.0.0",
+  "description": "Offline Layer — An offline-first SDK that makes any app work without internet",
+  "main": "server/index.js",
+  "scripts": {
+    "server": "node server/index.js",
+    "frontend": "npx -y live-server@latest --port=3000 --no-browser --cors",
+    "dev": "npx -y concurrently@latest \"npm run server\" \"npm run frontend\"",
+    "slides": "npx -y live-server@latest slides/ --port=3002 --no-browser"
+  },
+  "keywords": ["offline-first", "sdk", "cache", "sync", "ai-prediction"],
+  "author": "Offline Layer Team",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

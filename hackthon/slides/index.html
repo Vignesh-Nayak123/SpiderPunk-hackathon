@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline Layer — Pitch Deck</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/theme/night.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --r-background-color: #0a0e1a;
+      --r-main-font: 'Inter', sans-serif;
+      --r-heading-font: 'Inter', sans-serif;
+      --r-code-font: 'JetBrains Mono', monospace;
+      --r-main-font-size: 28px;
+      --r-heading-color: #f1f5f9;
+      --r-main-color: #94a3b8;
+    }
+    .reveal { font-family: 'Inter', sans-serif; }
+    .reveal h1, .reveal h2, .reveal h3 { font-family: 'Inter', sans-serif; font-weight: 700; }
+    .reveal h1 { font-size: 2.4em; }
+    .reveal h2 { font-size: 1.6em; }
+    .reveal h3 { font-size: 1.2em; }
+    .gradient-text {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .accent-blue { color: #3b82f6; }
+    .accent-green { color: #10b981; }
+    .accent-yellow { color: #f59e0b; }
+    .accent-red { color: #ef4444; }
+    .accent-purple { color: #8b5cf6; }
+    .accent-cyan { color: #06b6d4; }
+    .small { font-size: 0.6em; color: #64748b; }
+    .stat-box {
+      display: inline-block;
+      padding: 16px 28px;
+      margin: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      text-align: center;
+    }
+    .stat-num { font-size: 2.2em; font-weight: 800; display: block; }
+    .stat-label { font-size: 0.55em; color: #94a3b8; display: block; margin-top: 4px; }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .feature-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: left;
+      font-size: 0.65em;
+    }
+    .feature-item h4 { margin: 0 0 8px; font-size: 1.1em; color: #f1f5f9; }
+    .feature-item p { margin: 0; color: #94a3b8; font-size: 0.9em; line-height: 1.4; }
+    .code-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 24px 32px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7em;
+      text-align: left;
+      margin: 20px auto;
+      max-width: 700px;
+    }
+    .code-comment { color: #64748b; }
+    .code-keyword { color: #8b5cf6; }
+    .code-string { color: #10b981; }
+    .code-func { color: #3b82f6; }
+    .timeline { text-align: left; margin: 20px auto; max-width: 600px; }
+    .timeline-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+      font-size: 0.6em;
+    }
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+    .impact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-top: 24px;
+    }
+    .impact-item {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+    }
+    .impact-item .emoji { font-size: 2em; display: block; margin-bottom: 8px; }
+    .impact-item h4 { font-size: 0.8em; margin: 0 0 6px; color: #f1f5f9; }
+    .impact-item p { font-size: 0.55em; margin: 0; color: #94a3b8; }
+    .reveal .slides section { padding: 20px; }
+    .tag {
+      display: inline-block;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.5em;
+      font-weight: 600;
+      margin: 4px;
+    }
+    .tag-blue { background: rgba(59,130,246,0.15); color: #3b82f6; border: 1px solid rgba(59,130,246,0.3); }
+    .tag-purple { background: rgba(139,92,246,0.15); color: #8b5cf6; border: 1px solid rgba(139,92,246,0.3); }
+    .tag-green { background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+    .tag-cyan { background: rgba(6,182,212,0.15); color: #06b6d4; border: 1px solid rgba(6,182,212,0.3); }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ═══ SLIDE 1: Title ═══ -->
+      <section>
+        <p style="font-size:3em; margin-bottom: 0;">⚡</p>
+        <h1><span class="gradient-text">Offline Layer</span></h1>
+        <p style="font-size: 0.9em; color: #94a3b8;">Two lines of code. Any app. <strong style="color:#f1f5f9;">Offline-first.</strong></p>
+        <div style="margin-top: 30px;">
+          <span class="tag tag-blue">SDK</span>
+          <span class="tag tag-purple">AI-Powered</span>
+          <span class="tag tag-green">Offline-First</span>
+          <span class="tag tag-cyan">Delta Sync</span>
+        </div>
+        <p class="small" style="margin-top: 40px;">Hackathon 2026 • Built for India's 700M+ mobile users</p>
+      </section>
+
+      <!-- ═══ SLIDE 2: The Problem ═══ -->
+      <section>
+        <h2>📡 The Problem</h2>
+        <p style="font-size:0.7em; color:#94a3b8; margin-bottom: 24px;">India's connectivity reality</p>
+        <div style="display:flex; justify-content:center; gap:16px; flex-wrap:wrap;">
+          <div class="stat-box">
+            <span class="stat-num accent-red">300M+</span>
+            <span class="stat-label">Users on 2G/3G networks</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num accent-yellow">47%</span>
+            <span class="stat-label">Metro dead zone coverage</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-num accent-purple">83%</span>
+            <span class="stat-label">Apps break without internet</span>
+          </div>
+        </div>
+        <p style="font-size:0.65em; color:#ef4444; margin-top: 28px;">
+          💀 Users lose messages, forms fail, content disappears.<br>
+          Every dropped connection = lost user.
+        </p>
+      </section>
+
+      <!-- ═══ SLIDE 3: Solution ═══ -->
+      <section>
+        <h2>🛡️ Our Solution</h2>
+        <p style="font-size:0.7em; color:#94a3b8; margin-bottom: 20px;">A plug-and-play SDK that makes any app work offline</p>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <h4>🗄️ Smart Cache Engine</h4>
+            <p>Stores chats, feeds, and content locally with 50MB LRU budget</p>
+          </div>
+          <div class="feature-item">
+            <h4>📤 Offline Action Queue</h4>
+            <p>Queue actions offline, auto-sync when internet returns</p>
+          </div>
+          <div class="feature-item">
+            <h4>🧠 AI Prediction Layer</h4>
+            <p>Learns habits, pre-downloads content before signal drops</p>
+          </div>
+          <div class="feature-item">
+            <h4>⚡ Delta Sync Engine</h4>
+            <p>Only syncs the "diff" — saves data & battery</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ SLIDE 4: Tech Architecture ═══ -->
+      <section>
+        <h2>⚙️ Architecture</h2>
+        <div class="code-box" style="font-size:0.6em;">
+          <span class="code-comment">// That's it. Two lines. Your app now works offline.</span><br><br>
+          <span class="code-keyword">const</span> sdk = <span class="code-keyword">new</span> <span class="code-func">OfflineLayer</span>({ serverUrl: <span class="code-string">'https://api.yourapp.com'</span> });<br>
+          <span class="code-keyword">await</span> sdk.<span class="code-func">init</span>();<br><br>
+          <span class="code-comment">// Smart fetch — network first, cache fallback</span><br>
+          <span class="code-keyword">const</span> data = <span class="code-keyword">await</span> sdk.<span class="code-func">fetch</span>(<span class="code-string">'/api/messages'</span>);<br><br>
+          <span class="code-comment">// Offline action — queued & synced automatically</span><br>
+          <span class="code-keyword">await</span> sdk.<span class="code-func">queueAction</span>(<span class="code-string">'send_message'</span>, { text: <span class="code-string">'Hello!'</span> });
+        </div>
+        <div style="display:flex; justify-content:center; gap:16px; margin-top: 20px;">
+          <span class="tag tag-blue">IndexedDB</span>
+          <span class="tag tag-purple">Event-Driven</span>
+          <span class="tag tag-green">Cross-Origin</span>
+          <span class="tag tag-cyan">LRU Eviction</span>
+        </div>
+      </section>
+
+      <!-- ═══ SLIDE 5: AI Brain ═══ -->
+      <section>
+        <h2>🧠 The AI Brain</h2>
+        <p style="font-size:0.65em; color:#94a3b8; margin-bottom: 20px;">
+          Our <span class="accent-purple">killer differentiator</span> — the SDK learns user behavior
+        </p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#3b82f6;"></div>
+            <div><strong style="color:#f1f5f9;">Track</strong> — Logs every screen open: what, when, which day</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#8b5cf6;"></div>
+            <div><strong style="color:#f1f5f9;">Learn</strong> — Frequency-based pattern matching: "User opens News at 8am on weekdays"</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#06b6d4;"></div>
+            <div><strong style="color:#f1f5f9;">Predict</strong> — On WiFi, calls /predict → gets ranked content list with confidence scores</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#10b981;"></div>
+            <div><strong style="color:#f1f5f9;">Prefetch</strong> — Silently downloads predicted content into cache before signal drops</div>
+          </div>
+        </div>
+        <p style="font-size:0.7em; margin-top: 10px;">
+          Result: <span class="accent-green" style="font-weight:700;">87% prediction accuracy</span> •
+          <span class="accent-cyan" style="font-weight:700;">100% content hit rate</span>
+        </p>
+      </section>
+
+      <!-- ═══ SLIDE 6: Live Demo ═══ -->
+      <section>
+        <h2>🎬 Live Demo</h2>
+        <p style="font-size:0.7em; color:#94a3b8; margin-bottom: 24px;">
+          Watch it work in 60 seconds
+        </p>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#10b981;"></div>
+            <div><strong class="accent-green">🟢 Online</strong> — App loads normally, chat works, feed loads</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#ef4444;"></div>
+            <div><strong class="accent-red">🔴 Offline</strong> — Toggle offline. Banner turns red. Content still works!</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#f59e0b;"></div>
+            <div><strong class="accent-yellow">⏱ Send Message</strong> — Type and send while offline. Clock icon appears.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#10b981;"></div>
+            <div><strong class="accent-green">✓ Back Online</strong> — Toggle online. Syncing... Message delivered!</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#8b5cf6;"></div>
+            <div><strong class="accent-purple">🧠 AI Prediction</strong> — "We pre-fetched this at 8:55am — 100% hit rate"</div>
+          </div>
+        </div>
+        <p style="font-size:0.6em; color:#64748b; margin-top: 16px;">
+          ↓ Switch to <a href="http://localhost:3000" style="color:#3b82f6;">localhost:3000</a> for live demo ↓
+        </p>
+      </section>
+
+      <!-- ═══ SLIDE 7: Impact ═══ -->
+      <section>
+        <h2>🌍 Impact</h2>
+        <div class="impact-grid">
+          <div class="impact-item">
+            <span class="emoji">📱</span>
+            <h4>700M+ Users</h4>
+            <p>Indian mobile users who face connectivity issues daily</p>
+          </div>
+          <div class="impact-item">
+            <span class="emoji">🚇</span>
+            <h4>Metro Commuters</h4>
+            <p>30M daily riders in underground dead zones</p>
+          </div>
+          <div class="impact-item">
+            <span class="emoji">🌾</span>
+            <h4>Rural India</h4>
+            <p>300M users on 2G/3G with unreliable connectivity</p>
+          </div>
+        </div>
+        <p style="font-size:0.7em; margin-top: 28px; color:#94a3b8;">
+          Every app that integrates Offline Layer = <br>
+          <strong style="color:#10b981; font-size:1.3em;">zero dropped user experiences</strong>
+        </p>
+      </section>
+
+      <!-- ═══ SLIDE 8: Closing ═══ -->
+      <section>
+        <p style="font-size:3em; margin-bottom: 0;">⚡</p>
+        <h1><span class="gradient-text">Offline Layer</span></h1>
+        <p style="font-size: 1.2em; color: #f1f5f9; margin: 24px 0;">
+          Two lines of code.<br>
+          Any app.<br>
+          <span class="gradient-text" style="font-weight:800;">Offline-first.</span>
+        </p>
+        <div class="code-box" style="font-size:0.6em; text-align:center;">
+          <span class="code-keyword">const</span> sdk = <span class="code-keyword">new</span> <span class="code-func">OfflineLayer</span>({ serverUrl });<br>
+          <span class="code-keyword">await</span> sdk.<span class="code-func">init</span>();  <span class="code-comment">// That's it. ✅</span>
+        </div>
+        <p class="small" style="margin-top: 30px;">Thank you. Questions?</p>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+  <script>
+    Reveal.initialize({
+      hash: true,
+      transition: 'slide',
+      transitionSpeed: 'default',
+      backgroundTransition: 'fade',
+      controls: true,
+      progress: true,
+      center: true,
+      width: 1280,
+      height: 720
+    });
+  </script>
+</body>
+</html>
