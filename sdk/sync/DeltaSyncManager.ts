@@ -36,17 +36,22 @@ export const DeltaSyncManager = {
   async sync(): Promise<void> {
     const config    = SDKConfig.get();
     const lastSync  = await this.getLastSyncTime();
-    const deltaURL  = `${config.backendURL}${config.deltaEndpoint}?since=${lastSync}`;
+    const deltaURL  = `${config.backendURL}${config.deltaEndpoint}`;
 
+    const lastSyncedISO = lastSync > 0 ? new Date(lastSync).toISOString() : new Date(0).toISOString();
     Logger.info(
-      `Delta sync starting. since=${new Date(lastSync).toISOString()} (${lastSync})`
+      `Delta sync starting. last_synced_at=${lastSyncedISO}`
     );
 
     try {
       // Use rawFetch so we don't hit our own cache for a sync request
       const response = await NetworkInterceptor.rawFetch(deltaURL, {
-        method:  'GET',
+        method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: SDKConfig.get().userId,
+          last_synced_at: lastSyncedISO
+        })
       });
 
       if (!response.ok) {
@@ -54,30 +59,27 @@ export const DeltaSyncManager = {
       }
 
       const delta: DeltaResponse = await response.json();
-      const { changes, deletions, serverTime } = delta;
+      const { created, updated, deleted, server_time } = delta;
+
+      const changes = [...created, ...updated];
+      const deletions = deleted;
 
       Logger.info(
         `Delta received — ${changes.length} change(s), ${deletions.length} deletion(s).`
       );
 
       // ── Apply changes ────────────────────────────────────────────────────
-      for (const change of changes) {
-        // Generate the same key the NetworkInterceptor would use for a GET
-        const key = CacheKey.generate('GET', change.url);
-        await CacheEngine.updateFromDelta(key, change.data);
-        Logger.debug(`Delta UPDATED cache for: ${change.url}`);
-      }
-
-      // ── Apply deletions ───────────────────────────────────────────────────
-      for (const del of deletions) {
-        const key = CacheKey.generate('GET', del.url);
-        await CacheEngine.invalidate(key);
-        Logger.debug(`Delta REMOVED cache for: ${del.url}`);
+      if (changes.length > 0 || deletions.length > 0) {
+        // Invalidate the main messages list so the UI fetches fresh data
+        const messagesKey = CacheKey.generate('GET', `${config.backendURL}/api/messages`);
+        await CacheEngine.invalidate(messagesKey);
+        Logger.debug(`Delta invalidated cache for: /api/messages`);
       }
 
       // ── Advance the sync cursor ───────────────────────────────────────────
-      await this.setLastSyncTime(serverTime);
-      Logger.info(`Delta sync complete. Next sync cursor: ${serverTime}`);
+      const newCursorTime = new Date(server_time).getTime();
+      await this.setLastSyncTime(newCursorTime);
+      Logger.info(`Delta sync complete. Next sync cursor: ${server_time}`);
     } catch (err) {
       Logger.error('Delta sync failed — will retry on next reconnect:', err);
       // Don't update lastSyncTime so we re-pull the same window next time

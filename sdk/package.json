@@ -1,6 +1,6 @@
 {
   "name": "offline-layer-sdk",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "Offline-first SDK for React Native — smart cache, action queue, delta sync",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

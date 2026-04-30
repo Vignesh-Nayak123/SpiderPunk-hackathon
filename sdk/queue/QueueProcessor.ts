@@ -56,7 +56,7 @@ export const QueueProcessor = {
     // Mark all as 'syncing' so new offline actions that arrive mid-flush
     // don't get included in this batch
     for (const a of pending) {
-      await ActionQueue.setStatus(a.id, 'syncing');
+      await ActionQueue.setStatus(a.action_id, 'syncing');
     }
 
     let processedCount = 0;
@@ -68,7 +68,7 @@ export const QueueProcessor = {
       );
 
     try {
-      const payload: SyncPayload = { actions: pending, clientTime: Date.now() };
+      const payload: SyncPayload = { user_id: SDKConfig.get().userId, actions: pending };
 
       const response = await NetworkInterceptor.rawFetch(syncURL, {
         method:  'POST',
@@ -108,9 +108,9 @@ export const QueueProcessor = {
       Logger.error('Flush error — will retry on next reconnect:', err);
       // Revert 'syncing' → 'pending' so they're eligible next time
       for (const a of pending) {
-        const retries = await ActionQueue.incrementRetry(a.id);
+        const retries = await ActionQueue.incrementRetry(a.action_id);
         if (retries >= config.maxRetries) {
-          await ActionQueue.markFailed(a.id);
+          await ActionQueue.markFailed(a.action_id);
         }
       }
     } finally {

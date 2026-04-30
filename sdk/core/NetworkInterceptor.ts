@@ -13,7 +13,7 @@ import { Logger } from '../utils/Logger';
 import { HttpMethod } from '../queue/ActionSchema';
 
 // Keep a reference to the original fetch before we patch it
-const _originalFetch: typeof fetch = global.fetch;
+const _originalFetch: typeof fetch = globalThis.fetch;
 
 const READ_METHODS = new Set(['GET', 'HEAD']);
 const WRITE_METHODS = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE']);
@@ -57,20 +57,9 @@ async function offlineFetch(input: RequestInfo | URL, init?: RequestInit): Promi
   // ── READ path ──────────────────────────────────────────────────────────────
   if (READ_METHODS.has(method)) {
     const key = CacheKey.generate(method, url);
-    const cached = await CacheEngine.get(key);
 
-    if (cached !== null) {
-      Logger.debug(`Cache HIT: ${method} ${url}`);
-      const payload = JSON.stringify(cached);
-      return new Response(payload, {
-        status: 200,
-        headers: { 'Content-Type': 'application/json', 'X-OfflineLayer-Cache': 'hit' },
-      });
-    }
-
-    // Cache miss — try network if available, else return 503
-    if (OfflineDetector.isOnline()) {
-      Logger.debug(`Cache MISS — fetching: ${url}`);
+    // NETWORK-FIRST STRATEGY: Try network first for instant real-time chat
+    try {
       const response = await _originalFetch(input, init);
       if (response.ok) {
         const clone = response.clone();
@@ -80,26 +69,50 @@ async function offlineFetch(input: RequestInfo | URL, init?: RequestInit): Promi
         }
       }
       return response;
-    }
+    } catch (err) {
+      // NETWORK FAILED (Offline) -> Fallback to Cache
+      const cached = await CacheEngine.get(key);
+      if (cached !== null) {
+        Logger.debug(`Offline Cache Fallback: ${method} ${url}`);
+        return new Response(JSON.stringify(cached), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json', 'X-OfflineLayer-Cache': 'fallback' },
+        });
+      }
 
-    Logger.warn(`Offline cache MISS for: ${url} — returning 503`);
-    return new Response(JSON.stringify({ error: 'Offline and no cached data available.' }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' },
-    });
+      Logger.warn(`Offline cache MISS and network failed for: ${url}`);
+      return new Response(JSON.stringify({ error: 'Offline and no cached data available.' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   // ── WRITE path ─────────────────────────────────────────────────────────────
   if (WRITE_METHODS.has(method as HttpMethod)) {
-    if (!OfflineDetector.isOnline()) {
-      const body = await parseBody(init?.body);
-      const headers = normalizeHeaders(init?.headers);
-      const action = await ActionQueue.enqueue(url, method as HttpMethod, body, headers);
-      Logger.info(`Queued offline action: ${method} ${url} [${action.id}]`);
-      return queuedResponse(action.id);
+    const body = await parseBody(init?.body) as Record<string, any>;
+    
+    let type = 'UNKNOWN';
+    if (url.includes('/api/messages')) {
+      if (method === 'POST') type = 'SEND_MESSAGE';
+      else if (method === 'PUT' || method === 'PATCH') type = 'UPDATE_MESSAGE';
+      else if (method === 'DELETE') type = 'DELETE_MESSAGE';
     }
-    // Online — pass through
-    return _originalFetch(input, init);
+
+    const action = await ActionQueue.enqueue(type, body || {});
+    Logger.info(`Queued action: ${type} [${action.action_id}]`);
+
+    // Always try to trigger background flush immediately so it hits /sync/
+    // If it's truly offline, it will fail gracefully inside QueueProcessor.
+    import('../queue/QueueProcessor')
+      .then(async m => {
+        await m.QueueProcessor.flush();
+        const { DeltaSyncManager } = await import('../sync/DeltaSyncManager');
+        await DeltaSyncManager.sync();
+      })
+      .catch(err => Logger.error('Immediate flush failed', err));
+
+    return queuedResponse(action.action_id);
   }
 
   // Fallback for OPTIONS, etc.
@@ -109,18 +122,18 @@ async function offlineFetch(input: RequestInfo | URL, init?: RequestInit): Promi
 export const NetworkInterceptor = {
   /** Replaces global.fetch with the SDK interceptor. Called once by OfflineLayer.init() */
   install(): void {
-    if ((global.fetch as unknown as { __offlineLayer?: boolean }).__offlineLayer) {
+    if ((globalThis.fetch as unknown as { __offlineLayer?: boolean }).__offlineLayer) {
       Logger.debug('NetworkInterceptor already installed. Skipping.');
       return;
     }
-    global.fetch = offlineFetch as typeof fetch;
-    (global.fetch as unknown as { __offlineLayer: boolean }).__offlineLayer = true;
+    globalThis.fetch = offlineFetch as typeof fetch;
+    (globalThis.fetch as unknown as { __offlineLayer: boolean }).__offlineLayer = true;
     Logger.info('NetworkInterceptor installed — global fetch is now offline-first.');
   },
 
   /** Restores the original fetch. Useful for testing. */
   uninstall(): void {
-    global.fetch = _originalFetch;
+    globalThis.fetch = _originalFetch;
     Logger.info('NetworkInterceptor uninstalled.');
   },
 

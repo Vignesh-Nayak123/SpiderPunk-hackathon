@@ -62,6 +62,19 @@ const OfflineLayer = {
     // Start network listener; trigger sync pipeline on reconnect
     OfflineDetector.start(onReconnect);
 
+    // BACKGROUND POLLING: Guaranteed auto-queue flush even if native OS network events fail!
+    setInterval(async () => {
+      try {
+        const count = await ActionQueue.pendingCount();
+        if (count > 0) {
+          await QueueProcessor.flush();
+          await DeltaSyncManager.sync();
+        }
+      } catch (e) {
+        // fail silently if offline
+      }
+    }, 3000); // Check every 3 seconds for snappy demo experience
+
     Logger.info('SDK ready ✓');
   },
 
@@ -89,6 +102,16 @@ const OfflineLayer = {
     return OfflineDetector.on(listener);
   },
 
+  /** Set the active user ID */
+  setUserId(userId: string): void {
+    SDKConfig.setUserId(userId);
+  },
+
+  /** Get the active user ID */
+  getUserId(): string {
+    return SDKConfig.getUserId();
+  },
+
   // ── Queue ──────────────────────────────────────────────────────────────────
 
   /** Number of write actions waiting to be synced */
@@ -112,10 +135,22 @@ const OfflineLayer = {
     return QueueProcessor.onProgress(listener);
   },
 
-  /** Manually trigger a queue flush + delta sync (normally automatic on reconnect) */
+  /** Manually trigger a queue flush + delta sync (bypasses online check) */
   async forceSync(): Promise<void> {
     await QueueProcessor.flush();
     await DeltaSyncManager.sync();
+  },
+
+  /** Force a delta sync (useful on pull-to-refresh) */
+  async syncDelta(): Promise<void> {
+    if (!SDKConfig.isInitialized()) throw new Error('OfflineLayer not initialized');
+    return DeltaSyncManager.sync();
+  },
+
+  /** Enqueue a manual offline action (e.g. SEND_MESSAGE) */
+  async enqueueAction(type: string, payload: Record<string, any>): Promise<any> {
+    if (!SDKConfig.isInitialized()) throw new Error('OfflineLayer not initialized');
+    return ActionQueue.enqueue(type, payload);
   },
 
   // ── Cache ──────────────────────────────────────────────────────────────────

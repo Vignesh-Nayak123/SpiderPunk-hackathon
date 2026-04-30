@@ -7,10 +7,9 @@ def get_delta(user_id: str, last_synced_at):
     created = []
     deleted = []
     updated = []
-    # Get new or updated messages
+    # Get new or updated messages (all users for demo)
     messages = (
         db.query(Message)
-        .filter(Message.user_id == user_id)
         .filter(Message.updated_at > last_synced_at)
         .all()
     )

@@ -1,13 +1,12 @@
 from pydantic import BaseModel
-from datetime import datetime
-from typing import List
+from typing import List, Dict, Any, Optional
 
 class Action(BaseModel):
-    action_id:str
-    type:str
-    payload:dict
-    timestamp:datetime
+    action_id: str
+    type: str
+    payload: Dict[str, Any]
+    timestamp: str
 
 class SyncRequest(BaseModel):
-    user_id:str
-    actions:List[Action]
+    user_id: str
+    actions: List[Action]

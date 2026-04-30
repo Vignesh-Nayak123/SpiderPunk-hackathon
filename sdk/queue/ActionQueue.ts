@@ -45,26 +45,22 @@ export const ActionQueue = {
    * Returns the created action so callers can reference its ID.
    */
   async enqueue(
-    url: string,
-    method: HttpMethod,
-    body: unknown,
-    headers: Record<string, string> = {}
+    type: string,
+    payload: Record<string, any>
   ): Promise<QueuedAction> {
     return withLock(async () => {
       const queue = await this.getAll();
       const action: QueuedAction = {
-        id:        generateId(),
-        url,
-        method,
-        headers,
-        body,
-        timestamp: Date.now(),
+        action_id: generateId(),
+        type,
+        payload,
+        timestamp: new Date().toISOString(),
         retries:   0,
         status:    'pending',
       };
       queue.push(action);
       await StorageUtils.setItem(QUEUE_KEY, queue);
-      Logger.info(`Enqueued: ${method} ${url} [id: ${action.id}]`);
+      Logger.info(`Enqueued action: ${type} [id: ${action.action_id}]`);
       return action;
     });
   },
@@ -73,7 +69,7 @@ export const ActionQueue = {
   async dequeue(id: string): Promise<void> {
     return withLock(async () => {
       const queue = await this.getAll();
-      const next  = queue.filter((a) => a.id !== id);
+      const next  = queue.filter((a) => a.action_id !== id);
       await StorageUtils.setItem(QUEUE_KEY, next);
       Logger.debug(`Dequeued: ${id}`);
     });
@@ -83,7 +79,7 @@ export const ActionQueue = {
   async incrementRetry(id: string): Promise<number> {
     return withLock(async () => {
       const queue  = await this.getAll();
-      const action = queue.find((a) => a.id === id);
+      const action = queue.find((a) => a.action_id === id);
       if (!action) return 0;
       action.retries += 1;
       action.status   = 'pending';
@@ -96,11 +92,11 @@ export const ActionQueue = {
   async markFailed(id: string): Promise<void> {
     return withLock(async () => {
       const queue  = await this.getAll();
-      const action = queue.find((a) => a.id === id);
+      const action = queue.find((a) => a.action_id === id);
       if (action) {
         action.status = 'failed';
         await StorageUtils.setItem(QUEUE_KEY, queue);
-        Logger.warn(`Action permanently FAILED: ${id} (${action.method} ${action.url})`);
+        Logger.warn(`Action permanently FAILED: ${id} (${action.type})`);
       }
     });
   },
@@ -109,7 +105,7 @@ export const ActionQueue = {
   async setStatus(id: string, status: ActionStatus): Promise<void> {
     return withLock(async () => {
       const queue  = await this.getAll();
-      const action = queue.find((a) => a.id === id);
+      const action = queue.find((a) => a.action_id === id);
       if (action) {
         action.status = status;
         await StorageUtils.setItem(QUEUE_KEY, queue);

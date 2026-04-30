@@ -19,7 +19,9 @@ export interface SDKConfigOptions {
   debug?: boolean;
   /** Offline conflict resolution strategy. Default: 'last-write-wins' */
   conflictStrategy?: ConflictStrategy;
-  /** Max retry attempts per queued action. Default: 3 */
+  /** Current active user ID. Default: 'default_user' */
+  userId?: string;
+  /** Max retries... */
   maxRetries?: number;
 }
 
@@ -32,6 +34,7 @@ export interface ResolvedConfig {
   debug: boolean;
   conflictStrategy: ConflictStrategy;
   maxRetries: number;
+  userId: string;
 }
 
 const DEFAULTS: Omit<ResolvedConfig, 'backendURL'> = {
@@ -42,6 +45,7 @@ const DEFAULTS: Omit<ResolvedConfig, 'backendURL'> = {
   debug:             false,
   conflictStrategy:  'last-write-wins',
   maxRetries:        3,
+  userId:            'default_user',
 };
 
 let _config: ResolvedConfig | null = null;
@@ -74,4 +78,12 @@ export const SDKConfig = {
   _reset(): void {
     _config = null;
   },
+
+  setUserId(id: string): void {
+    if (_config) _config.userId = id;
+  },
+
+  getUserId(): string {
+    return _config ? _config.userId : 'default_user';
+  }
 };
